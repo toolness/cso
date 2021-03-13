@@ -37,30 +37,30 @@ impl CSO {
     fn tick_point(&mut self, p: &Point) {
         if self.is_occupied_at(p) { return };
 
-        if let Some(above) = p.above() {
-            if self.is_occupied_at(&above) {
-                return self.move_from_to(&above, p);
+        if let Some(ref above) = p.above() {
+            if self.is_occupied_at(above) {
+                return self.move_from_to(above, p);
             }
-            if let Some(above_left) = above.left() {
-                if let Some(left) = p.left() {
-                    if self.is_occupied_at(&above_left) && self.is_occupied_at(&left) {
+            if let Some(ref above_left) = above.left() {
+                if let Some(ref left) = p.left() {
+                    if self.is_occupied_at(above_left) && self.is_occupied_at(left) {
                         let mut should_move = true;
-                        if let Some(left_of_left) = left.left() {
-                            if self.is_empty_at(&left_of_left) {
+                        if let Some(ref left_of_left) = left.left() {
+                            if self.is_empty_at(left_of_left) {
                                 // The grain is basically at the top of a mound and we
                                 // should flip a coin to determine which direction it goes.
                                 should_move = self.rng.next_bool();
                             }
                         }
                         if should_move {
-                            return self.move_from_to(&above_left, p);
+                            return self.move_from_to(above_left, p);
                         }
                     }
                 }
             }
-            if let Some(above_right) = above.right_in(self) {
-                if self.is_occupied_at(&above_right) {
-                    return self.move_from_to(&above_right, p);
+            if let Some(ref above_right) = above.right_in(self) {
+                if self.is_occupied_at(above_right) {
+                    return self.move_from_to(above_right, p);
                 }
             }
         }

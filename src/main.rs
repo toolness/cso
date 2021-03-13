@@ -4,6 +4,7 @@ mod cso;
 mod point;
 
 use cso::CSO;
+use point::Point;
 
 use sdl2::pixels::Color;
 use sdl2::event::Event;
@@ -14,8 +15,7 @@ use std::time::Duration;
 fn main() {
     const PX_SIZE: u32 = 8;
     let mut sim = CSO::new(32, 32);
-    let drip_x = sim.width / 2;
-    let drip_y = 0;
+    let drip_pt = Point::at(sim.width / 2, 0);
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
@@ -32,8 +32,8 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
     'running: loop {
-        if i % 8 == 0 && sim.is_empty_at(drip_x, drip_y) {
-            sim.set(drip_x, drip_y, 1);
+        if i % 8 == 0 && sim.is_empty_at(&drip_pt) {
+            sim.set(&drip_pt, 1);
         }
         sim.tick();
 
@@ -42,7 +42,7 @@ fn main() {
         canvas.clear();
         for y in 0..sim.height {
             for x in 0..sim.width {
-                if sim.get(x, y) == 0 {
+                if sim.get(&Point::at(x, y)) == 0 {
                     canvas.set_draw_color(Color::BLACK);
                 } else {
                     canvas.set_draw_color(Color::RGB(i, 64, 255 - i));

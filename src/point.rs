@@ -11,7 +11,7 @@ impl Point {
     }
 
     pub fn is_occupied_in(&self, cso: &CSO) -> bool {
-        cso.is_occupied_at(self.x, self.y)
+        cso.is_occupied_at(self)
     }
 
     pub fn above(&self) -> Option<Point> {

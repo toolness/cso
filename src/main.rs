@@ -15,15 +15,8 @@ use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
 fn main() {
-    let mut rnd = Random { seed: 5 };
-
-    for _i in 0..10 {
-        print!("Random float: {}\n", rnd.next_float());
-        print!("Random bool: {}\n", rnd.next_bool());
-    }
-
     const PX_SIZE: u32 = 8;
-    let mut sim = CSO::new(32, 32);
+    let mut sim = CSO::new(32, 32, Random { seed: 5 });
     let drip_pt = Point::at(sim.width / 2, 0);
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();

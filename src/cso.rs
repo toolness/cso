@@ -1,14 +1,16 @@
 use super::point::Point;
+use super::random::Random;
 
 pub struct CSO {
     arr: Vec<u8>,
+    rng: Random,
     pub width: u32,
     pub height: u32,
 }
 
 impl CSO {
-    pub fn new(width: u32, height: u32) -> CSO {
-        CSO { arr: vec![0; (width * height) as usize], width, height }
+    pub fn new(width: u32, height: u32, rng: Random) -> CSO {
+        CSO { arr: vec![0; (width * height) as usize], width, height, rng }
     }
 
     pub fn set(&mut self, point: &Point, value: u8) {
@@ -41,7 +43,7 @@ impl CSO {
             }
             if let Some(above_left) = above.left() {
                 if let Some(left) = p.left() {
-                    if above_left.is_occupied_in(self) && left.is_occupied_in(self) {
+                    if above_left.is_occupied_in(self) && left.is_occupied_in(self) && self.rng.next_bool() {
                         return self.move_from_to(&above_left, p);
                     }
                 }

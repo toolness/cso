@@ -2,9 +2,11 @@ extern crate sdl2;
 
 mod cso;
 mod point;
+mod random;
 
 use cso::CSO;
 use point::Point;
+use random::Random;
 
 use sdl2::pixels::Color;
 use sdl2::event::Event;
@@ -13,6 +15,13 @@ use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
 fn main() {
+    let mut rnd = Random { seed: 5 };
+
+    for _i in 0..10 {
+        print!("Random float: {}\n", rnd.next_float());
+        print!("Random bool: {}\n", rnd.next_bool());
+    }
+
     const PX_SIZE: u32 = 8;
     let mut sim = CSO::new(32, 32);
     let drip_pt = Point::at(sim.width / 2, 0);

@@ -21,6 +21,10 @@ impl CSO {
         self.get(x, y) != 0
     }
 
+    pub fn is_empty_at(&self, x: u32, y: u32) -> bool {
+        self.get(x, y) == 0
+    }
+
     pub fn move_from_to(&mut self, x1: u32, y1: u32, x2: u32, y2: u32) {
         let value = self.get(x1, y1);
         self.set(x2, y2, value);
@@ -32,7 +36,13 @@ impl CSO {
 
         if y > 0 {
             if self.is_occupied_at(x, y - 1) {
-                self.move_from_to(x, y - 1, x, y);
+                return self.move_from_to(x, y - 1, x, y);
+            }
+            if x > 0 && self.is_occupied_at(x - 1, y - 1) && self.is_occupied_at(x - 1, y) {
+                return self.move_from_to(x - 1, y - 1, x, y);
+            }
+            if x < self.width && self.is_occupied_at(x + 1, y - 1) {
+                return self.move_from_to(x + 1, y - 1, x, y);
             }
         }
     }

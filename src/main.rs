@@ -13,8 +13,8 @@ use std::time::Duration;
 fn main() {
     const PX_SIZE: u32 = 8;
     let mut sim = CSO::new(32, 32);
-    let dripX = sim.width / 2;
-    let dripY = 0;
+    let drip_x = sim.width / 2;
+    let drip_y = 0;
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
@@ -31,8 +31,8 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
     'running: loop {
-        if sim.is_empty_at(dripX, dripY) {
-            sim.set(dripX, dripY, 1);
+        if sim.is_empty_at(drip_x, drip_y) {
+            sim.set(drip_x, drip_y, 1);
         }
         sim.tick();
 

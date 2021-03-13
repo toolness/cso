@@ -1,6 +1,7 @@
 extern crate sdl2;
 
 mod cso;
+mod point;
 
 use cso::CSO;
 

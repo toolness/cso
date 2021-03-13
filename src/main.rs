@@ -31,7 +31,7 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
     'running: loop {
-        if sim.is_empty_at(drip_x, drip_y) {
+        if i % 8 == 0 && sim.is_empty_at(drip_x, drip_y) {
             sim.set(drip_x, drip_y, 1);
         }
         sim.tick();

@@ -1,3 +1,30 @@
+struct Point {
+    pub x: u32,
+    pub y: u32,
+}
+
+impl Point {
+    fn at(x: u32, y: u32) -> Point {
+        Point { x, y }
+    }
+
+    pub fn is_occupied_in(&self, cso: &CSO) -> bool {
+        cso.is_occupied_at(self.x, self.y)
+    }
+
+    pub fn above(&self) -> Option<Point> {
+        if self.y > 0 { Some(Point::at(self.x, self.y - 1)) } else { None }
+    }
+
+    pub fn left(&self) -> Option<Point> {
+        if self.x > 0 { Some(Point::at(self.x - 1, self.y)) } else { None }
+    }
+
+    pub fn right_in(&self, cso: &CSO) -> Option<Point> {
+        if self.x < cso.width { Some(Point::at(self.x + 1, self.y)) } else { None }
+    }
+}
+
 pub struct CSO {
     arr: Vec<u8>,
     pub width: u32,
@@ -25,24 +52,30 @@ impl CSO {
         self.get(x, y) == 0
     }
 
-    pub fn move_from_to(&mut self, x1: u32, y1: u32, x2: u32, y2: u32) {
-        let value = self.get(x1, y1);
-        self.set(x2, y2, value);
-        self.set(x1, y1, 0);
+    fn move_from_to(&mut self, from: Point, to: Point) {
+        let value = self.get(from.x, from.y);
+        self.set(to.x, to.y, value);
+        self.set(from.x, from.y, 0);
     }
 
-    fn tick_xy(&mut self, x: u32, y: u32) {
-        if self.is_occupied_at(x, y) { return };
+    fn tick_point(&mut self, p: Point) {
+        if p.is_occupied_in(self) { return };
 
-        if y > 0 {
-            if self.is_occupied_at(x, y - 1) {
-                return self.move_from_to(x, y - 1, x, y);
+        if let Some(above) = p.above() {
+            if above.is_occupied_in(self) {
+                return self.move_from_to(above, p);
             }
-            if x > 0 && self.is_occupied_at(x - 1, y - 1) && self.is_occupied_at(x - 1, y) {
-                return self.move_from_to(x - 1, y - 1, x, y);
+            if let Some(above_left) = above.left() {
+                if let Some(left) = p.left() {
+                    if above_left.is_occupied_in(self) && left.is_occupied_in(self) {
+                        return self.move_from_to(above_left, p);
+                    }
+                }
             }
-            if x < self.width && self.is_occupied_at(x + 1, y - 1) {
-                return self.move_from_to(x + 1, y - 1, x, y);
+            if let Some(above_right) = above.right_in(self) {
+                if above_right.is_occupied_in(self) {
+                    return self.move_from_to(above_right, p);
+                }
             }
         }
     }
@@ -50,7 +83,7 @@ impl CSO {
     pub fn tick(&mut self) {
         for y in (0..self.height).rev() {
             for x in (0..self.width).rev() {
-                self.tick_xy(x, y);
+                self.tick_point(Point::at(x, y));
             }
         }
     }

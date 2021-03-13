@@ -12,10 +12,10 @@ use std::time::Duration;
 
 fn main() {
     const PX_SIZE: u32 = 8;
-    let mut sim = CSO::new(100, 100);
+    let mut sim = CSO::new(32, 32);
     sim.set(5, 5, 1);
     sim.set(6, 6, 1);
-    sim.set(99, 99, 1);
+    sim.set(sim.width - 1, sim.height - 1, 1);
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
@@ -32,6 +32,8 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
     'running: loop {
+        sim.tick();
+
         i = (i + 1) % 255;
         canvas.set_draw_color(Color::BLACK);
         canvas.clear();

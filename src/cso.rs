@@ -43,8 +43,18 @@ impl CSO {
             }
             if let Some(above_left) = above.left() {
                 if let Some(left) = p.left() {
-                    if above_left.is_occupied_in(self) && left.is_occupied_in(self) && self.rng.next_bool() {
-                        return self.move_from_to(&above_left, p);
+                    if above_left.is_occupied_in(self) && left.is_occupied_in(self) {
+                        let mut should_move = true;
+                        if let Some(left_of_left) = left.left() {
+                            if self.is_empty_at(&left_of_left) {
+                                // The grain is basically at the top of a mound and we
+                                // should flip a coin to determine which direction it goes.
+                                should_move = self.rng.next_bool();
+                            }
+                        }
+                        if should_move {
+                            return self.move_from_to(&above_left, p);
+                        }
                     }
                 }
             }

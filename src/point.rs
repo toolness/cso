@@ -10,10 +10,6 @@ impl Point {
         Point { x, y }
     }
 
-    pub fn is_occupied_in(&self, cso: &CSO) -> bool {
-        cso.is_occupied_at(self)
-    }
-
     pub fn above(&self) -> Option<Point> {
         if self.y > 0 { Some(Point::at(self.x, self.y - 1)) } else { None }
     }

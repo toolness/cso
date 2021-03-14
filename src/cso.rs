@@ -89,6 +89,18 @@ impl CSO {
         }
     }
 
+    fn maybe_spread_sewage(&mut self, point: &Point, maybe_other: &Option<Point>) {
+        if let Some(other) = maybe_other {
+            let point_cell = self.get(point);
+            let other_cell = self.get(other);
+            if point_cell == Cell::Water && other_cell == Cell::Sewage {
+                self.set(point, Cell::Sewage);
+            } else if point_cell == Cell::Sewage && other_cell == Cell::Water {
+                self.set(other, Cell::Sewage);
+            }
+        }
+    }
+
     fn tick_point(&mut self, p: &Point) {
         if self.is_liquid_at(p) {
             if let Some(ref above) = p.above() {
@@ -98,6 +110,8 @@ impl CSO {
                     }
                 }
             }
+            self.maybe_spread_sewage(p, &p.left());
+            self.maybe_spread_sewage(p, &p.above());
         }
 
         if self.is_occupied_at(p) { return };

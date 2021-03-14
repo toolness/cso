@@ -15,6 +15,7 @@ use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
 const PX_SIZE: u32 = 8;
+const FPS: u32 = 15;
 
 const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
 const BMP_SEWAGE_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
@@ -108,6 +109,6 @@ fn main() {
         }
 
         canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / FPS));
     }
 }

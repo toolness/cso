@@ -15,8 +15,6 @@ use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
 const PX_SIZE: u32 = 8;
-const FRAMES_PER_DRIP: u8 = 8;
-const CELLS_PER_DRIP: u8 = 2;
 
 const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
 const BMP_SAND_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
@@ -64,7 +62,7 @@ fn main() {
                 factories.push(CellFactory {
                     point: Point::at(x, y),
                     cell: Cell::Sand,
-                    interval: 4,
+                    interval: 8,
                     count: 1
                 });
             }
@@ -79,7 +77,7 @@ fn main() {
     let mut i = 0;
     'running: loop {
         for factory in factories.iter() {
-            if i % FRAMES_PER_DRIP < CELLS_PER_DRIP && sim.is_empty_at(&factory.point) {
+            if i % factory.interval < factory.count && sim.is_empty_at(&factory.point) {
                 sim.set(&factory.point, factory.cell);
             }
         }

@@ -16,6 +16,7 @@ use std::time::Duration;
 
 fn main() {
     const PX_SIZE: u32 = 8;
+    const FRAMES_PER_DRIP: u8 = 8;
     let env = bmp::open("environment.bmp").unwrap();
     let mut sim = CSO::new(env.get_width(), env.get_height(), Random { seed: 5 });
     let drip_pt = Point::at(sim.width / 2, 0);
@@ -42,7 +43,7 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
     'running: loop {
-        if i % 8 == 0 && sim.is_empty_at(&drip_pt) {
+        if i % FRAMES_PER_DRIP == 0 && sim.is_empty_at(&drip_pt) {
             sim.set(&drip_pt, Cell::Sand);
         }
         sim.tick();

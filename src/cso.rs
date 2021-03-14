@@ -61,6 +61,44 @@ impl CSO {
         if direction > 0 { p.right_in(self) } else { p.left() }
     }
 
+    fn get_closest_path_down(&mut self, start_point: &Point) -> Option<Point> {
+        let mut to_explore: Vec<(Point, i8)> = vec![(*start_point, -1), (*start_point, 1)];
+        let mut best: Option<(i8, i32)> = None;
+
+        while let Some((p, direction)) = to_explore.pop() {
+            let maybe_neighbor = self.in_lateral_direction(&p, direction);
+            if let Some(neighbor) = maybe_neighbor {
+                if self.is_empty_at(&neighbor) {
+                    if let Some(below_neighbor) = neighbor.below_in(self) {
+                        if self.is_empty_at(&below_neighbor) {
+                            let dist = (neighbor.x as i32 - start_point.x as i32).abs();
+                            let mut set_best = false;
+                            if let Some((_, best_dist)) = best {
+                                if dist < best_dist {
+                                    set_best = true;
+                                } else if dist == best_dist {
+                                    set_best = self.rng.next_bool();
+                                }
+                            } else {
+                                set_best = true;
+                            }
+                            if set_best {
+                                best = Some((direction, dist));
+                            }
+                        } else {
+                            to_explore.push((neighbor, direction));
+                        }
+                    }
+                }
+            }
+        }
+
+        match best {
+            Some((direction, _)) => self.in_lateral_direction(start_point, direction),
+            None => None,
+        }
+    }
+
     fn get_liquid_displacement(&self, start_point: &Point) -> Option<Point> {
         let mut to_explore: Vec<(Point, i8)> = vec![(*start_point, -1), (*start_point, 1)];
         let mut best: Option<(Point, i32)> = None;
@@ -105,7 +143,9 @@ impl CSO {
         if self.is_liquid_at(p) {
             if let Some(ref above) = p.above() {
                 if self.is_liquid_at(above) {
-                    if let Some(ref displacement) = self.get_liquid_displacement(p) {
+                    if let Some(ref to) = self.get_closest_path_down(above) {
+                        return self.move_from_to(above, to);
+                    } else if let Some(ref displacement) = self.get_liquid_displacement(p) {
                         return self.move_from_to(above, displacement);
                     }
                 }

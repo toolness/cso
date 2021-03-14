@@ -22,4 +22,8 @@ impl Point {
     pub fn right_in(&self, cso: &CSO) -> Option<Point> {
         if self.x < cso.width - 1 { Some(Point::at(self.x + 1, self.y)) } else { None }
     }
+
+    pub fn below_in(&self, cso: &CSO) -> Option<Point> {
+        if self.y < cso.height - 1 { Some(Point::at(self.x, self.y + 1)) } else { None }
+    }
 }

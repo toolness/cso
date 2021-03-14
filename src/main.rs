@@ -14,10 +14,24 @@ use sdl2::rect::Rect;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
+const PX_SIZE: u32 = 8;
+const FRAMES_PER_DRIP: u8 = 8;
+const CELLS_PER_DRIP: u8 = 2;
+
+const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
+const BMP_SAND_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
+const BMP_WATER_COLOR: bmp::Pixel = bmp::Pixel { r: 91, g: 110, b: 225 };
+
+const STATIC_COLOR: Color = Color::WHITE;
+const EMPTY_COLOR: Color = Color::BLACK;
+const SAND_COLOR: Color = bmp_to_sdl_color(&BMP_SAND_COLOR);
+const WATER_COLOR: Color = bmp_to_sdl_color(&BMP_WATER_COLOR);
+
+const fn bmp_to_sdl_color(color: &bmp::Pixel) -> Color {
+    Color::RGBA(color.r, color.g, color.b, 255)
+}
+
 fn main() {
-    const PX_SIZE: u32 = 8;
-    const FRAMES_PER_DRIP: u8 = 8;
-    const CELLS_PER_DRIP: u8 = 2;
     let env = bmp::open("environment.bmp").unwrap();
     let mut sim = CSO::new(env.get_width(), env.get_height(), Random { seed: 5 });
     let drip_pt = Point::at(sim.width / 2, 0);
@@ -33,14 +47,20 @@ fn main() {
 
     for (x, y) in env.coordinates() {
         let value = env.get_pixel(x, y);
-        if value == bmp::consts::WHITE {
-            sim.set(&Point::at(x, y), Cell::Static);
+        match value {
+            BMP_STATIC_COLOR => {
+                sim.set(&Point::at(x, y), Cell::Static);
+            }
+            BMP_SAND_COLOR => {
+                sim.set(&Point::at(x, y), Cell::Sand);
+            }
+            BMP_WATER_COLOR => {
+                sim.set(&Point::at(x, y), Cell::Water);
+            }
+            _ => {}
         }
     }
 
-    canvas.set_draw_color(Color::RGB(0, 255, 255));
-    canvas.clear();
-    canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
     'running: loop {
@@ -50,23 +70,13 @@ fn main() {
         sim.tick();
 
         i = (i + 1) % 255;
-        canvas.set_draw_color(Color::BLACK);
-        canvas.clear();
         for y in 0..sim.height {
             for x in 0..sim.width {
                 let color: Color = match sim.get(&Point::at(x, y)) {
-                    Cell::Empty => {
-                        Color::BLACK
-                    }
-                    Cell::Static => {
-                        Color::WHITE
-                    },
-                    Cell::Sand => {
-                        Color::RGB(i, 64, 255 - i)
-                    },
-                    Cell::Water => {
-                        Color::RGB(0, 64, 180 + (i % 70))
-                    },
+                    Cell::Empty => { EMPTY_COLOR }
+                    Cell::Static => { STATIC_COLOR }
+                    Cell::Sand => { SAND_COLOR }
+                    Cell::Water => { WATER_COLOR }
                 };
                 canvas.set_draw_color(color);
                 canvas.fill_rect(Rect::new((x * PX_SIZE) as i32, (y * PX_SIZE) as i32, PX_SIZE, PX_SIZE)).unwrap();

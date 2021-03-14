@@ -31,12 +31,21 @@ const fn bmp_to_sdl_color(color: &bmp::Pixel) -> Color {
     Color::RGBA(color.r, color.g, color.b, 255)
 }
 
+pub struct CellFactory {
+    pub point: Point,
+    pub cell: Cell,
+    pub interval: u8,
+    pub count: u8
+}
+
 fn main() {
     let env = bmp::open("environment.bmp").unwrap();
     let mut sim = CSO::new(env.get_width(), env.get_height(), Random { seed: 5 });
-    let drip_pt = Point::at(sim.width / 2, 0);
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
+    let mut factories: Vec<CellFactory> = vec![
+        CellFactory { point: Point::at(sim.width / 2, 0), cell: Cell::Water, interval: 8, count: 2 },
+    ];
 
     let window = video_subsystem.window("cso", sim.width * PX_SIZE, sim.height * PX_SIZE)
         .position_centered()
@@ -52,7 +61,12 @@ fn main() {
                 sim.set(&Point::at(x, y), Cell::Static);
             }
             BMP_SAND_COLOR => {
-                sim.set(&Point::at(x, y), Cell::Sand);
+                factories.push(CellFactory {
+                    point: Point::at(x, y),
+                    cell: Cell::Sand,
+                    interval: 4,
+                    count: 1
+                });
             }
             BMP_WATER_COLOR => {
                 sim.set(&Point::at(x, y), Cell::Water);
@@ -64,8 +78,10 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
     'running: loop {
-        if i % FRAMES_PER_DRIP < CELLS_PER_DRIP && sim.is_empty_at(&drip_pt) {
-            sim.set(&drip_pt, Cell::Water);
+        for factory in factories.iter() {
+            if i % FRAMES_PER_DRIP < CELLS_PER_DRIP && sim.is_empty_at(&factory.point) {
+                sim.set(&factory.point, factory.cell);
+            }
         }
         sim.tick();
 

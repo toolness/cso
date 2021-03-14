@@ -7,6 +7,7 @@ pub enum Cell {
     Static,
     Sand,
     Water,
+    Sewage,
 }
 
 pub struct CSO {
@@ -45,7 +46,10 @@ impl CSO {
     }
 
     pub fn is_liquid_at(&self, point: &Point) -> bool {
-        self.get(point) == Cell::Water
+        match self.get(point) {
+            Cell::Water | Cell::Sewage => true,
+            _ => false
+        }
     }
 
     fn move_from_to(&mut self, from: &Point, to: &Point) {

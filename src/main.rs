@@ -17,12 +17,12 @@ use std::time::Duration;
 const PX_SIZE: u32 = 8;
 
 const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
-const BMP_SAND_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
+const BMP_SEWAGE_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
 const BMP_WATER_COLOR: bmp::Pixel = bmp::Pixel { r: 91, g: 110, b: 225 };
 
 const STATIC_COLOR: Color = Color::WHITE;
 const EMPTY_COLOR: Color = Color::BLACK;
-const SAND_COLOR: Color = bmp_to_sdl_color(&BMP_SAND_COLOR);
+const SEWAGE_COLOR: Color = bmp_to_sdl_color(&BMP_SEWAGE_FACTORY_COLOR);
 const WATER_COLOR: Color = bmp_to_sdl_color(&BMP_WATER_COLOR);
 
 const fn bmp_to_sdl_color(color: &bmp::Pixel) -> Color {
@@ -58,10 +58,10 @@ fn main() {
             BMP_STATIC_COLOR => {
                 sim.set(&Point::at(x, y), Cell::Static);
             }
-            BMP_SAND_COLOR => {
+            BMP_SEWAGE_FACTORY_COLOR => {
                 factories.push(CellFactory {
                     point: Point::at(x, y),
-                    cell: Cell::Sand,
+                    cell: Cell::Sewage,
                     interval: 8,
                     count: 1
                 });
@@ -89,8 +89,9 @@ fn main() {
                 let color: Color = match sim.get(&Point::at(x, y)) {
                     Cell::Empty => { EMPTY_COLOR }
                     Cell::Static => { STATIC_COLOR }
-                    Cell::Sand => { SAND_COLOR }
+                    Cell::Sand => { SEWAGE_COLOR }
                     Cell::Water => { WATER_COLOR }
+                    Cell::Sewage => { SEWAGE_COLOR }
                 };
                 canvas.set_draw_color(color);
                 canvas.fill_rect(Rect::new((x * PX_SIZE) as i32, (y * PX_SIZE) as i32, PX_SIZE, PX_SIZE)).unwrap();

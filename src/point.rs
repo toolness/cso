@@ -1,5 +1,6 @@
 use super::cso::CSO;
 
+#[derive(Copy, Clone)]
 pub struct Point {
     pub x: u32,
     pub y: u32,

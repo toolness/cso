@@ -53,7 +53,49 @@ impl CSO {
         self.set(from, Cell::Empty);
     }
 
+    fn in_lateral_direction(&self, p: &Point, direction: i8) -> Option<Point> {
+        if direction > 0 { p.right_in(self) } else { p.left() }
+    }
+
+    fn get_liquid_displacement(&self, start_point: &Point) -> Option<Point> {
+        let mut to_explore: Vec<(Point, i8)> = vec![(*start_point, -1), (*start_point, 1)];
+        let mut best: Option<(Point, i32)> = None;
+
+        while let Some((p, direction)) = to_explore.pop() {
+            let maybe_neighbor = self.in_lateral_direction(&p, direction);
+            if let Some(neighbor) = maybe_neighbor {
+                if self.is_empty_at(&neighbor) {
+                    let dist = ((neighbor.x as i32 - start_point.x as i32) + (neighbor.y as i32 - start_point.y as i32)).abs();
+                    if let Some((_, best_dist)) = best {
+                        if dist < best_dist {
+                            best = Some((neighbor, dist));
+                        }
+                    } else {
+                        best = Some((neighbor, dist));
+                    }
+                } else if self.is_liquid_at(&neighbor) {
+                    to_explore.push((neighbor, direction));
+                }
+            }
+        }
+
+        match best {
+            Some((best_point, _)) => Some(best_point),
+            None => None,
+        }
+    }
+
     fn tick_point(&mut self, p: &Point) {
+        if self.is_liquid_at(p) {
+            if let Some(ref above) = p.above() {
+                if self.is_liquid_at(above) {
+                    if let Some(ref displacement) = self.get_liquid_displacement(p) {
+                        return self.move_from_to(above, displacement);
+                    }
+                }
+            }
+        }
+
         if self.is_occupied_at(p) { return };
 
         if let Some(ref above) = p.above() {
@@ -81,12 +123,6 @@ impl CSO {
                 if self.is_movable_at(above_right) {
                     return self.move_from_to(above_right, p);
                 }
-            }
-        }
-
-        if let Some(ref left) = p.left() {
-            if self.is_liquid_at(left) {
-                return self.move_from_to(left, p);
             }
         }
     }

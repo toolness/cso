@@ -19,6 +19,7 @@ const FPS: u32 = 15;
 
 const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
 const BMP_SEWAGE_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
+const BMP_DRAIN_COLOR: bmp::Pixel = bmp::Pixel { r: 153, g: 229, b: 80 };
 const BMP_WATER_COLOR: bmp::Pixel = bmp::Pixel { r: 91, g: 110, b: 225 };
 
 const STATIC_COLOR: Color = Color::WHITE;
@@ -37,6 +38,11 @@ pub struct CellFactory {
     pub count: u8
 }
 
+pub struct CellDrain {
+    pub point: Point,
+    pub interval: u8,
+}
+
 fn main() {
     let env = bmp::open("environment.bmp").unwrap();
     let mut sim = CSO::new(env.get_width(), env.get_height(), Random { seed: 5 });
@@ -45,30 +51,38 @@ fn main() {
     let mut factories: Vec<CellFactory> = vec![
         CellFactory { point: Point::at(sim.width / 2, 0), cell: Cell::Water, interval: 8, count: 2 },
     ];
+    let mut drains: Vec<CellDrain> = vec![];
 
     let window = video_subsystem.window("cso", sim.width * PX_SIZE, sim.height * PX_SIZE)
         .position_centered()
         .build()
         .unwrap();
-    
+
     let mut canvas = window.into_canvas().build().unwrap();
 
     for (x, y) in env.coordinates() {
         let value = env.get_pixel(x, y);
+        let point = Point::at(x, y);
         match value {
             BMP_STATIC_COLOR => {
-                sim.set(&Point::at(x, y), Cell::Static);
+                sim.set(&point, Cell::Static);
             }
             BMP_SEWAGE_FACTORY_COLOR => {
                 factories.push(CellFactory {
-                    point: Point::at(x, y),
+                    point,
                     cell: Cell::Sewage,
                     interval: 8,
                     count: 1
                 });
             }
+            BMP_DRAIN_COLOR => {
+                drains.push(CellDrain {
+                    point,
+                    interval: 16
+                });
+            }
             BMP_WATER_COLOR => {
-                sim.set(&Point::at(x, y), Cell::Water);
+                sim.set(&point, Cell::Water);
             }
             _ => {}
         }
@@ -80,6 +94,11 @@ fn main() {
         for factory in factories.iter() {
             if i % factory.interval < factory.count && sim.is_empty_at(&factory.point) {
                 sim.set(&factory.point, factory.cell);
+            }
+        }
+        for drain in drains.iter() {
+            if i % drain.interval == 0 {
+                sim.set(&drain.point, Cell::Empty);
             }
         }
         sim.tick();

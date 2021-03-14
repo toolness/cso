@@ -19,6 +19,7 @@ const FPS: u32 = 15;
 
 const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
 const BMP_SEWAGE_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
+const BMP_WATER_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 95, g: 205, b: 228 };
 const BMP_DRAIN_COLOR: bmp::Pixel = bmp::Pixel { r: 153, g: 229, b: 80 };
 const BMP_WATER_COLOR: bmp::Pixel = bmp::Pixel { r: 91, g: 110, b: 225 };
 
@@ -48,9 +49,7 @@ fn main() {
     let mut sim = CSO::new(env.get_width(), env.get_height(), Random { seed: 5 });
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
-    let mut factories: Vec<CellFactory> = vec![
-        CellFactory { point: Point::at(sim.width / 2, 0), cell: Cell::Water, interval: 8, count: 2 },
-    ];
+    let mut factories: Vec<CellFactory> = vec![];
     let mut drains: Vec<CellDrain> = vec![];
 
     let window = video_subsystem.window("cso", sim.width * PX_SIZE, sim.height * PX_SIZE)
@@ -66,6 +65,14 @@ fn main() {
         match value {
             BMP_STATIC_COLOR => {
                 sim.set(&point, Cell::Static);
+            }
+            BMP_WATER_FACTORY_COLOR => {
+                factories.push(CellFactory {
+                    point,
+                    cell: Cell::Water,
+                    interval: 8,
+                    count: 2
+                });
             }
             BMP_SEWAGE_FACTORY_COLOR => {
                 factories.push(CellFactory {

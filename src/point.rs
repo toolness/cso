@@ -19,6 +19,6 @@ impl Point {
     }
 
     pub fn right_in(&self, cso: &CSO) -> Option<Point> {
-        if self.x < cso.width { Some(Point::at(self.x + 1, self.y)) } else { None }
+        if self.x < cso.width - 1 { Some(Point::at(self.x + 1, self.y)) } else { None }
     }
 }

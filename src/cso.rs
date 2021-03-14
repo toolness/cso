@@ -5,7 +5,8 @@ use super::random::Random;
 pub enum Cell {
     Empty,
     Static,
-    Sand
+    Sand,
+    Water,
 }
 
 pub struct CSO {
@@ -43,6 +44,10 @@ impl CSO {
         self.get(point) == Cell::Empty
     }
 
+    pub fn is_liquid_at(&self, point: &Point) -> bool {
+        self.get(point) == Cell::Water
+    }
+
     fn move_from_to(&mut self, from: &Point, to: &Point) {
         self.set(to, self.get(from));
         self.set(from, Cell::Empty);
@@ -76,6 +81,12 @@ impl CSO {
                 if self.is_movable_at(above_right) {
                     return self.move_from_to(above_right, p);
                 }
+            }
+        }
+
+        if let Some(ref left) = p.left() {
+            if self.is_liquid_at(left) {
+                return self.move_from_to(left, p);
             }
         }
     }

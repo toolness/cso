@@ -44,7 +44,7 @@ fn main() {
     let mut i = 0;
     'running: loop {
         if i % FRAMES_PER_DRIP == 0 && sim.is_empty_at(&drip_pt) {
-            sim.set(&drip_pt, Cell::Sand);
+            sim.set(&drip_pt, Cell::Water);
         }
         sim.tick();
 
@@ -62,7 +62,10 @@ fn main() {
                     },
                     Cell::Sand => {
                         Color::RGB(i, 64, 255 - i)
-                    }
+                    },
+                    Cell::Water => {
+                        Color::RGB(0, 64, 180 + (i % 70))
+                    },
                 };
                 canvas.set_draw_color(color);
                 canvas.fill_rect(Rect::new((x * PX_SIZE) as i32, (y * PX_SIZE) as i32, PX_SIZE, PX_SIZE)).unwrap();

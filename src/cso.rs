@@ -1,8 +1,14 @@
 use super::point::Point;
 use super::random::Random;
 
+#[derive(PartialEq, Clone, Copy)]
+pub enum Cell {
+    Empty,
+    Sand
+}
+
 pub struct CSO {
-    arr: Vec<u8>,
+    arr: Vec<Cell>,
     rng: Random,
     pub width: u32,
     pub height: u32,
@@ -10,28 +16,28 @@ pub struct CSO {
 
 impl CSO {
     pub fn new(width: u32, height: u32, rng: Random) -> CSO {
-        CSO { arr: vec![0; (width * height) as usize], width, height, rng }
+        CSO { arr: vec![Cell::Empty; (width * height) as usize], width, height, rng }
     }
 
-    pub fn set(&mut self, point: &Point, value: u8) {
+    pub fn set(&mut self, point: &Point, value: Cell) {
         self.arr[(point.y * self.width + point.x) as usize] = value;
     }
 
-    pub fn get(&self, point: &Point) -> u8 {
+    pub fn get(&self, point: &Point) -> Cell {
         self.arr[(point.y * self.width + point.x) as usize]
     }
 
     pub fn is_occupied_at(&self, point: &Point) -> bool {
-        self.get(point) != 0
+        self.get(point) != Cell::Empty
     }
 
     pub fn is_empty_at(&self, point: &Point) -> bool {
-        self.get(point) == 0
+        self.get(point) == Cell::Empty
     }
 
     fn move_from_to(&mut self, from: &Point, to: &Point) {
         self.set(to, self.get(from));
-        self.set(from, 0);
+        self.set(from, Cell::Empty);
     }
 
     fn tick_point(&mut self, p: &Point) {

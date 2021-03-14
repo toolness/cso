@@ -4,7 +4,7 @@ mod cso;
 mod point;
 mod random;
 
-use cso::CSO;
+use cso::{CSO, Cell};
 use point::Point;
 use random::Random;
 
@@ -35,7 +35,7 @@ fn main() {
     let mut i = 0;
     'running: loop {
         if i % 8 == 0 && sim.is_empty_at(&drip_pt) {
-            sim.set(&drip_pt, 1);
+            sim.set(&drip_pt, Cell::Sand);
         }
         sim.tick();
 
@@ -44,10 +44,13 @@ fn main() {
         canvas.clear();
         for y in 0..sim.height {
             for x in 0..sim.width {
-                if sim.get(&Point::at(x, y)) == 0 {
-                    canvas.set_draw_color(Color::BLACK);
-                } else {
-                    canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
+                match sim.get(&Point::at(x, y)) {
+                    Cell::Empty => {
+                        canvas.set_draw_color(Color::BLACK);
+                    }
+                    Cell::Sand => {
+                        canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
+                    }
                 }
                 canvas.fill_rect(Rect::new((x * PX_SIZE) as i32, (y * PX_SIZE) as i32, PX_SIZE, PX_SIZE)).unwrap();
             }

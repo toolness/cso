@@ -16,7 +16,8 @@ use std::time::Duration;
 
 fn main() {
     const PX_SIZE: u32 = 8;
-    let mut sim = CSO::new(32, 32, Random { seed: 5 });
+    let env = bmp::open("environment.bmp").unwrap();
+    let mut sim = CSO::new(env.get_width(), env.get_height(), Random { seed: 5 });
     let drip_pt = Point::at(sim.width / 2, 0);
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -27,6 +28,13 @@ fn main() {
         .unwrap();
     
     let mut canvas = window.into_canvas().build().unwrap();
+
+    for (x, y) in env.coordinates() {
+        let value = env.get_pixel(x, y);
+        if value == bmp::consts::WHITE {
+            sim.set(&Point::at(x, y), Cell::Static);
+        }
+    }
 
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
@@ -44,14 +52,18 @@ fn main() {
         canvas.clear();
         for y in 0..sim.height {
             for x in 0..sim.width {
-                match sim.get(&Point::at(x, y)) {
+                let color: Color = match sim.get(&Point::at(x, y)) {
                     Cell::Empty => {
-                        canvas.set_draw_color(Color::BLACK);
+                        Color::BLACK
                     }
+                    Cell::Static => {
+                        Color::WHITE
+                    },
                     Cell::Sand => {
-                        canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
+                        Color::RGB(i, 64, 255 - i)
                     }
-                }
+                };
+                canvas.set_draw_color(color);
                 canvas.fill_rect(Rect::new((x * PX_SIZE) as i32, (y * PX_SIZE) as i32, PX_SIZE, PX_SIZE)).unwrap();
             }
         }

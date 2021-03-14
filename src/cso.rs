@@ -4,6 +4,7 @@ use super::random::Random;
 #[derive(PartialEq, Clone, Copy)]
 pub enum Cell {
     Empty,
+    Static,
     Sand
 }
 
@@ -31,6 +32,13 @@ impl CSO {
         self.get(point) != Cell::Empty
     }
 
+    pub fn is_movable_at(&self, point: &Point) -> bool {
+        match self.get(point) {
+            Cell::Empty | Cell::Static => false,
+            _ => true,
+        }
+    }
+
     pub fn is_empty_at(&self, point: &Point) -> bool {
         self.get(point) == Cell::Empty
     }
@@ -44,12 +52,12 @@ impl CSO {
         if self.is_occupied_at(p) { return };
 
         if let Some(ref above) = p.above() {
-            if self.is_occupied_at(above) {
+            if self.is_movable_at(above) {
                 return self.move_from_to(above, p);
             }
             if let Some(ref above_left) = above.left() {
                 if let Some(ref left) = p.left() {
-                    if self.is_occupied_at(above_left) && self.is_occupied_at(left) {
+                    if self.is_movable_at(above_left) && self.is_occupied_at(left) {
                         let mut should_move = true;
                         if let Some(ref left_of_left) = left.left() {
                             if self.is_empty_at(left_of_left) {
@@ -65,7 +73,7 @@ impl CSO {
                 }
             }
             if let Some(ref above_right) = above.right_in(self) {
-                if self.is_occupied_at(above_right) {
+                if self.is_movable_at(above_right) {
                     return self.move_from_to(above_right, p);
                 }
             }

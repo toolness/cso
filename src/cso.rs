@@ -12,6 +12,7 @@ pub enum Cell {
 
 pub struct CSO {
     arr: Vec<Cell>,
+    moved_this_tick: Vec<bool>,
     rng: Random,
     pub width: u32,
     pub height: u32,
@@ -19,7 +20,8 @@ pub struct CSO {
 
 impl CSO {
     pub fn new(width: u32, height: u32, rng: Random) -> CSO {
-        CSO { arr: vec![Cell::Empty; (width * height) as usize], width, height, rng }
+        let len = (width * height) as usize;
+        CSO { arr: vec![Cell::Empty; len], moved_this_tick: vec![false; len], width, height, rng }
     }
 
     pub fn set(&mut self, point: &Point, value: Cell) {
@@ -28,6 +30,14 @@ impl CSO {
 
     pub fn get(&self, point: &Point) -> Cell {
         self.arr[(point.y * self.width + point.x) as usize]
+    }
+
+    fn set_moved_this_tick_at(&mut self, point: &Point, value: bool) {
+        self.moved_this_tick[(point.y * self.width + point.x) as usize] = value;
+    }
+
+    fn moved_this_tick_at(&self, point: &Point) -> bool {
+        self.moved_this_tick[(point.y * self.width + point.x) as usize]
     }
 
     pub fn is_occupied_at(&self, point: &Point) -> bool {
@@ -53,8 +63,12 @@ impl CSO {
     }
 
     fn move_from_to(&mut self, from: &Point, to: &Point) {
-        self.set(to, self.get(from));
-        self.set(from, Cell::Empty);
+        if !self.moved_this_tick_at(from) {
+            self.set(to, self.get(from));
+            self.set(from, Cell::Empty);
+            self.set_moved_this_tick_at(to, true);
+            self.set_moved_this_tick_at(from, false);
+        }
     }
 
     fn in_lateral_direction(&self, p: &Point, direction: i8) -> Option<Point> {
@@ -140,21 +154,28 @@ impl CSO {
     }
 
     fn tick_point(&mut self, p: &Point) {
-        if self.is_liquid_at(p) {
+        if self.is_occupied_at(p) {
+            let is_liquid = self.is_liquid_at(p);
+
+            if is_liquid {
+                self.maybe_spread_sewage(p, &p.left());
+                self.maybe_spread_sewage(p, &p.above());
+            }
+
             if let Some(ref above) = p.above() {
                 if self.is_liquid_at(above) {
                     if let Some(ref to) = self.get_closest_path_down(above) {
                         return self.move_from_to(above, to);
-                    } else if let Some(ref displacement) = self.get_liquid_displacement(p) {
-                        return self.move_from_to(above, displacement);
+                    } else if is_liquid {
+                        if let Some(ref displacement) = self.get_liquid_displacement(p) {
+                            return self.move_from_to(above, displacement);
+                        }
                     }
                 }
             }
-            self.maybe_spread_sewage(p, &p.left());
-            self.maybe_spread_sewage(p, &p.above());
-        }
 
-        if self.is_occupied_at(p) { return };
+            return;
+        };
 
         if let Some(ref above) = p.above() {
             if self.is_movable_at(above) {
@@ -186,6 +207,12 @@ impl CSO {
     }
 
     pub fn tick(&mut self) {
+        for y in (0..self.height).rev() {
+            for x in (0..self.width).rev() {
+                self.set_moved_this_tick_at(&Point::at(x, y), false);
+            }
+        }
+
         for y in (0..self.height).rev() {
             for x in (0..self.width).rev() {
                 self.tick_point(&Point::at(x, y));

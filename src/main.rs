@@ -15,7 +15,9 @@ use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
 const PX_SIZE: u32 = 8;
-const FPS: u32 = 15;
+const INITIAL_FPS: u32 = 15;
+const FPS_INCREMENT: u32 = 15;
+const MAX_FPS: u32 = 60;
 
 const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
 const BMP_SEWAGE_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
@@ -52,10 +54,13 @@ fn main() {
     let mut factories: Vec<CellFactory> = vec![];
     let mut drains: Vec<CellDrain> = vec![];
     let mut enable_water_factories: bool = false;
+    let mut fps = INITIAL_FPS;
 
     print!("Combined Sewage Overflow simulator\n");
     print!("Keys:\n");
     print!("R - Toggle rain\n");
+    print!("- - Decrease FPS\n");
+    print!("= - Increase FPS\n");
 
     let window = video_subsystem.window("cso", sim.width * PX_SIZE, sim.height * PX_SIZE)
         .position_centered()
@@ -143,11 +148,24 @@ fn main() {
                     enable_water_factories = !enable_water_factories;
                     print!("Rain {}.\n", if enable_water_factories { "enabled" } else { "disabled" });
                 },
+                Event::KeyDown { keycode: Some(keycode), .. } if keycode == Keycode::Equals || keycode == Keycode::Minus => {
+                    if keycode == Keycode::Equals {
+                        fps += FPS_INCREMENT;
+                    } else {
+                        fps -= FPS_INCREMENT;
+                    }
+                    if fps <= 0 {
+                        fps = FPS_INCREMENT;
+                    } else if fps > MAX_FPS {
+                        fps = MAX_FPS;
+                    }
+                    print!("FPS: {}.\n", fps);
+                },
                 _ => {}
             }
         }
 
         canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / FPS));
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / fps));
     }
 }

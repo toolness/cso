@@ -51,6 +51,11 @@ fn main() {
     let video_subsystem = sdl_context.video().unwrap();
     let mut factories: Vec<CellFactory> = vec![];
     let mut drains: Vec<CellDrain> = vec![];
+    let mut enable_water_factories: bool = false;
+
+    print!("Combined Sewage Overflow simulator\n");
+    print!("Keys:\n");
+    print!("R - Toggle rain\n");
 
     let window = video_subsystem.window("cso", sim.width * PX_SIZE, sim.height * PX_SIZE)
         .position_centered()
@@ -99,6 +104,9 @@ fn main() {
     let mut i = 0;
     'running: loop {
         for factory in factories.iter() {
+            if factory.cell == Cell::Water && !enable_water_factories {
+                continue;
+            }
             if i % factory.interval < factory.count && sim.is_empty_at(&factory.point) {
                 sim.set(&factory.point, factory.cell);
             }
@@ -128,7 +136,12 @@ fn main() {
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                    print!("Exiting.\n");
                     break 'running
+                },
+                Event::KeyDown { keycode: Some(Keycode::R), .. } => {
+                    enable_water_factories = !enable_water_factories;
+                    print!("Rain {}.\n", if enable_water_factories { "enabled" } else { "disabled" });
                 },
                 _ => {}
             }

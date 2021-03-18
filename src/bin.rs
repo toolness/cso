@@ -1,18 +1,14 @@
 extern crate sdl2;
 
-mod cso;
-mod point;
-mod random;
-
-use cso::{CSO, Cell};
-use point::Point;
-use random::Random;
-
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::rect::Rect;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
+
+use csolib::cso::{CSO, Cell};
+use csolib::point::Point;
+use csolib::random::Random;
 
 const PX_SIZE: u32 = 8;
 const INITIAL_FPS: u32 = 15;

@@ -5,6 +5,6 @@ For Windows, follow the instructions for [Windows (MSVC)](https://github.com/Rus
 Then build and run via:
 
 ```
-cargo build
-cargo run
+cargo build -p sdl
+cargo run -p sdl
 ```

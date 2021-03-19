@@ -43,8 +43,8 @@ pub struct CellDrain {
 }
 
 fn main() {
-    let env = bmp::open("environment.bmp").unwrap();
-    let mut sim = CSO::new(env.get_width(), env.get_height(), Random { seed: 5 });
+    let level = bmp::open("level.bmp").unwrap();
+    let mut sim = CSO::new(level.get_width(), level.get_height(), Random { seed: 5 });
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
     let mut factories: Vec<CellFactory> = vec![];
@@ -65,8 +65,8 @@ fn main() {
 
     let mut canvas = window.into_canvas().build().unwrap();
 
-    for (x, y) in env.coordinates() {
-        let value = env.get_pixel(x, y);
+    for (x, y) in level.coordinates() {
+        let value = level.get_pixel(x, y);
         let point = Point::at(x, y);
         match value {
             BMP_STATIC_COLOR => {

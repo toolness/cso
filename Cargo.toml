@@ -1,2 +1,2 @@
 [workspace]
-members = ["csolib", "sdl"]
+members = ["csolib", "sdl", "web"]

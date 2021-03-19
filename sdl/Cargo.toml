@@ -1,0 +1,14 @@
+[package]
+name = "sdl"
+version = "0.1.0"
+authors = ["Atul Varma <varmaa@gmail.com>"]
+edition = "2018"
+
+[[bin]]
+name = "sdl"
+path = "src/bin.rs"
+
+[dependencies]
+sdl2 = "0.34"
+bmp = "0.5.0"
+csolib = { path = "../csolib" }

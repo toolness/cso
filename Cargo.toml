@@ -1,19 +1,2 @@
-[package]
-name = "cso"
-version = "0.1.0"
-authors = ["Atul Varma <varmaa@gmail.com>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[lib]
-name = "csolib"
-path = "src/lib.rs"
-
-[[bin]]
-name = "csobin"
-path = "src/bin.rs"
-
-[dependencies]
-sdl2 = "0.34"
-bmp = "0.5.0"
+[workspace]
+members = ["csolib", "sdl"]

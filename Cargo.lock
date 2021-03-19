@@ -28,11 +28,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 
 [[package]]
-name = "cso"
+name = "csolib"
 version = "0.1.0"
 dependencies = [
  "bmp",
- "sdl2",
 ]
 
 [[package]]
@@ -46,6 +45,15 @@ name = "libc"
 version = "0.2.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03b07a082330a35e43f63177cc01689da34fbffa0105e1246cf0311472cac73a"
+
+[[package]]
+name = "sdl"
+version = "0.1.0"
+dependencies = [
+ "bmp",
+ "csolib",
+ "sdl2",
+]
 
 [[package]]
 name = "sdl2"

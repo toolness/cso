@@ -12,6 +12,20 @@ async function fetchBytes(url: string): Promise<Uint8Array> {
   return new Uint8Array(buf);
 }
 
+// https://2ality.com/2020/04/classes-as-values-typescript.html
+type Class<T> = new (...args: any[]) => T;
+
+function getElement<T extends Element>(selector: string, classObj: Class<T>): T {
+  const thing = document.querySelector(selector);
+  if (!thing) {
+    throw new Error(`Nothing matches selector "${selector}"`);
+  }
+  if (!(thing instanceof classObj)) {
+    throw new Error(`Expected selector "${selector}" to match a ${classObj.name}`);
+  }
+  return thing;
+}
+
 async function run() {
   await init();
 
@@ -19,13 +33,11 @@ async function run() {
   const width = level.get_width();
   const height = level.get_height();
 
-  const canvas = document.createElement('canvas');
+  const canvas = getElement('#canvas', HTMLCanvasElement);
   canvas.width = width;
   canvas.height = height;
   canvas.style.width = `${width * PX_SIZE}px`;
   canvas.style.height = `${height * PX_SIZE}px`;
-
-  document.body.appendChild(canvas);
 
   const ctx = canvas.getContext('2d');
 

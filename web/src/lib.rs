@@ -44,4 +44,8 @@ impl WebLevel {
             }
         }
     }
+
+    pub fn tick(&mut self) {
+        self.level.tick();
+    }
 }

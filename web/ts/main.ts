@@ -1,6 +1,7 @@
 import init, { WebLevel } from "../pkg/web.js";
 
 const PX_SIZE = 8;
+const INITIAL_FPS = 15;
 
 async function run() {
   await init();
@@ -29,13 +30,22 @@ async function run() {
   const imgData = ctx.createImageData(width, height);
   const imgDataBuf = imgData.data.buffer;
   const uint8Array = new Uint8Array(imgDataBuf);
-  level.draw(uint8Array);
 
-  ctx.putImageData(imgData, 0, 0);
+  let timeout = 0;
 
-  console.log(`level: ${width}x${height}`);
+  const drawFrame = () => {
+    level.draw(uint8Array);
+    ctx.putImageData(imgData, 0, 0);
+    level.tick();
+    timeout = setTimeout(drawFrame, 1000 / INITIAL_FPS);
+  }
 
-  level.free();
+  drawFrame();
+
+  return () => {
+    level.free();
+    clearTimeout(timeout);
+  };
 }
 
 run();

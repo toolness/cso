@@ -1,20 +1,51 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+html {
+  padding: 8px;
+}
+
+.subtitle {
+  margin-top: -1em;
+}
+
+body {
+  max-width: 320px;
+  margin: 0 auto;
+  text-align: center;
+  font-family: 'Calibri', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
 canvas {
+  display: block;
+  margin: 0 auto;
+
   /* Firefox */
   image-rendering: crisp-edges;
   /* Webkit */
   image-rendering: pixelated;
 }
 </style>
-<title>cso</title>
-<h1>cso</h1>
+<title>Combined Sewer Overflow Simulator</title>
+<h1>Combined Sewer Overflow Simulator</h1>
+<p class="subtitle">By Atul Varma</p>
 <canvas id="canvas"></canvas>
 <p>
-  <label for="fps">Speed</label> <input type="range" id="fps" min="1" max="60" value="15" step="1">
+  <label for="fps">Speed</label><br><input type="range" id="fps" min="1" max="60" value="15" step="1">
 </p>
 <p>
-  <label><input type="checkbox" id="rain"> Make it rain</label>
+  <label for="rain">Rain</label><br><input type="range" id="rain" min="0" max="1" value="0" step="1">
+</p>
+<p>
+  This is a simulation of a combined sewer system in which sewage water (brown pixels) are combined with
+  surface runoff (blue pixels).
+</p>
+<p>
+  The body of water at the bottom left of the simulation is a canal into
+  which the sewer system may overflow.
+</p>
+<p>
+  Learn more at the <a href="https://github.com/toolness/cso/" target="_blank">GitHub repository</a> and <a href="https://en.wikipedia.org/wiki/Combined_sewer" target="_blank">Wikipedia</a>.
 </p>
 <script type="module" src="web/ts/main.js"></script>

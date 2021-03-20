@@ -1,12 +1,25 @@
 use wasm_bindgen::prelude::*;
+use csolib::level::Level;
 
 #[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
+pub struct WebLevel {
+    level: Level,
 }
 
-#[wasm_bindgen(start)]
-pub fn main() -> Result<(), JsValue> {
-    alert(&format!("TODO: Implement CSO in wasm!"));
-    Ok(())
+#[wasm_bindgen]
+impl WebLevel {
+    pub fn new(bmp_bytes: &[u8]) -> WebLevel {
+        let mut mutable_bytes = bmp_bytes;
+        let bmp = bmp::from_reader(&mut mutable_bytes).unwrap();
+        let level = Level::from_bmp(bmp);
+        WebLevel { level }
+    }
+
+    pub fn get_width(&self) -> u32 {
+        self.level.sim.width
+    }
+
+    pub fn get_height(&self) -> u32 {
+        self.level.sim.height
+    }
 }

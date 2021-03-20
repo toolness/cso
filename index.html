@@ -3,7 +3,20 @@
 <title>cso</title>
 <h1>cso</h1>
 <script type="module">
-import init from "./web/pkg/web.js";
+import init, { WebLevel } from "./web/pkg/web.js";
 
-init();
+async function run() {
+  await init();
+
+  const res = await fetch("level.bmp");
+  const buf = await res.arrayBuffer();
+  const view = new Uint8Array(buf);
+  const level = WebLevel.new(view);
+
+  console.log(`level: ${level.get_width()}x${level.get_height()}`);
+
+  level.free();
+}
+
+run();
 </script>

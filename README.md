@@ -29,3 +29,11 @@ Note that while TypeScript will be automatically rebuild under `npm run watch`, 
 ```
 npm run wasm
 ```
+
+## Deployment
+
+Deploying the web version to GitHub Pages can be done via:
+
+```
+npm run deploy
+```

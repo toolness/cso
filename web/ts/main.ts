@@ -26,6 +26,20 @@ function getElement<T extends Element>(selector: string, classObj: Class<T>): T 
   return thing;
 }
 
+function toPositiveFloat(value: string): number {
+  const result = parseFloat(value);
+
+  if (isNaN(result)) {
+    throw new Error(`Expected "${value}" to be convertible to a float`);
+  }
+
+  if (result <= 0) {
+    throw new Error(`Expected "${value}" to be greater than zero`);
+  }
+
+  return result;
+}
+
 async function run() {
   await init();
 
@@ -33,6 +47,7 @@ async function run() {
   const width = level.get_width();
   const height = level.get_height();
 
+  const fpsRange = getElement('#fps', HTMLInputElement);
   const canvas = getElement('#canvas', HTMLCanvasElement);
   canvas.width = width;
   canvas.height = height;
@@ -55,7 +70,7 @@ async function run() {
     level.draw(uint8Array);
     ctx.putImageData(imgData, 0, 0);
     level.tick();
-    timeout = setTimeout(drawFrame, 1000 / INITIAL_FPS);
+    timeout = setTimeout(drawFrame, 1000 / toPositiveFloat(fpsRange.value));
   }
 
   drawFrame();

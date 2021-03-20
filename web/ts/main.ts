@@ -83,6 +83,7 @@ async function run() {
 
   const syncRain = () => level.set_enable_water_factories(rainCheckbox.checked);
   rainCheckbox.onchange = syncRain;
+  syncRain();
 
   const drawFrame = () => {
     level.draw(uint8Array);

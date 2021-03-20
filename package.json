@@ -1,0 +1,23 @@
+{
+  "name": "cso",
+  "version": "1.0.0",
+  "description": "To build and run this natively, you'll need to set up the SDL development libraries.",
+  "main": "index.js",
+  "scripts": {
+    "build": "wasm-pack build web --target web && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toolness/cso.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/toolness/cso/issues"
+  },
+  "homepage": "https://github.com/toolness/cso#readme",
+  "dependencies": {
+    "typescript": "^4.2.3"
+  }
+}

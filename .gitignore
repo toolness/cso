@@ -1,2 +1,5 @@
 /target
 *.dll
+/node_modules
+/web/ts/*.js
+/web/ts/*.js.map

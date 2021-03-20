@@ -13,12 +13,13 @@ cargo run -p sdl
 
 ## Web app
 
-You will need to install [wasm-pack](https://rustwasm.github.io/docs/wasm-pack/).
+You will need to install [wasm-pack](https://rustwasm.github.io/docs/wasm-pack/) and [Node JS](https://nodejs.org/).
 
 Then run:
 
 ```
-wasm-pack build web --target web
+npm install
+npm run build
 ```
 
 Then start a web server in the root directory of this repository via e.g.

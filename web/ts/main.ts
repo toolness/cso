@@ -40,35 +40,49 @@ function toPositiveFloat(value: string): number {
   return result;
 }
 
-async function run() {
-  await init();
-
-  const level = WebLevel.new(await fetchBytes("level.bmp"));
+function setCanvasSize(canvas: HTMLCanvasElement, level: WebLevel) {
   const width = level.get_width();
   const height = level.get_height();
 
-  const fpsRange = getElement('#fps', HTMLInputElement);
-  const rainCheckbox = getElement('#rain', HTMLInputElement);
-  const canvas = getElement('#canvas', HTMLCanvasElement);
   canvas.width = width;
   canvas.height = height;
   canvas.style.width = `${width * PX_SIZE}px`;
   canvas.style.height = `${height * PX_SIZE}px`;
+}
 
+function createCanvasImageData(ctx: CanvasRenderingContext2D) {
+  const imgData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
+  const imgDataBuf = imgData.data.buffer;
+  const uint8Array = new Uint8Array(imgDataBuf);
+  return { imgData, uint8Array };
+}
+
+function getCanvasCtx2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
     throw new Error("Unable to obtain 2d canvas context");
   }
 
+  return ctx;
+}
+
+async function run() {
+  await init();
+
+  const level = WebLevel.new(await fetchBytes("level.bmp"));
+  const fpsRange = getElement('#fps', HTMLInputElement);
+  const rainCheckbox = getElement('#rain', HTMLInputElement);
+  const canvas = getElement('#canvas', HTMLCanvasElement);
+
+  setCanvasSize(canvas, level);
+
+  const ctx = getCanvasCtx2d(canvas);
+  const {imgData, uint8Array} = createCanvasImageData(ctx);
+  let timeout = 0;
+
   const syncRain = () => level.set_enable_water_factories(rainCheckbox.checked);
   rainCheckbox.onchange = syncRain;
-
-  const imgData = ctx.createImageData(width, height);
-  const imgDataBuf = imgData.data.buffer;
-  const uint8Array = new Uint8Array(imgDataBuf);
-
-  let timeout = 0;
 
   const drawFrame = () => {
     level.draw(uint8Array);

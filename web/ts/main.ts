@@ -89,14 +89,14 @@ async function run() {
     level.draw(uint8Array);
     ctx.putImageData(imgData, 0, 0);
     level.tick();
-    timeout = setTimeout(drawFrame, 1000 / toPositiveFloat(fpsRange.value));
+    timeout = window.setTimeout(drawFrame, 1000 / toPositiveFloat(fpsRange.value));
   }
 
   drawFrame();
 
   return () => {
     level.free();
-    clearTimeout(timeout);
+    window.clearTimeout(timeout);
   };
 }
 

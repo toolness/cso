@@ -25,6 +25,10 @@ impl WebLevel {
         self.level.sim.height
     }
 
+    pub fn set_enable_water_factories(&mut self, enable: bool) {
+        self.level.enable_water_factories = enable;
+    }
+
     pub fn draw(&self, arr: &mut [u8]) {
         let mut i = 0;
         for y in 0..self.level.sim.height {

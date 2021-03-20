@@ -48,6 +48,7 @@ async function run() {
   const height = level.get_height();
 
   const fpsRange = getElement('#fps', HTMLInputElement);
+  const rainCheckbox = getElement('#rain', HTMLInputElement);
   const canvas = getElement('#canvas', HTMLCanvasElement);
   canvas.width = width;
   canvas.height = height;
@@ -59,6 +60,9 @@ async function run() {
   if (!ctx) {
     throw new Error("Unable to obtain 2d canvas context");
   }
+
+  const syncRain = () => level.set_enable_water_factories(rainCheckbox.checked);
+  rainCheckbox.onchange = syncRain;
 
   const imgData = ctx.createImageData(width, height);
   const imgDataBuf = imgData.data.buffer;

@@ -72,7 +72,7 @@ async function run() {
 
   const level = WebLevel.new(await fetchBytes("level.bmp"));
   const fpsRange = getElement('#fps', HTMLInputElement);
-  const rainCheckbox = getElement('#rain', HTMLInputElement);
+  const rainRange = getElement('#rain', HTMLInputElement);
   const canvas = getElement('#canvas', HTMLCanvasElement);
 
   setCanvasSize(canvas, level);
@@ -81,11 +81,8 @@ async function run() {
   const {imgData, uint8Array} = createCanvasImageData(ctx);
   let timeout = 0;
 
-  const syncRain = () => level.set_enable_water_factories(rainCheckbox.checked);
-  rainCheckbox.onchange = syncRain;
-  syncRain();
-
   const drawFrame = () => {
+    level.set_enable_water_factories(parseInt(rainRange.value) > 0);
     level.draw(uint8Array);
     ctx.putImageData(imgData, 0, 0);
     level.tick();

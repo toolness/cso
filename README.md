@@ -13,14 +13,19 @@ cargo run -p sdl
 
 ## Web app
 
-You will need to install [wasm-pack](https://rustwasm.github.io/docs/wasm-pack/) and [Node JS](https://nodejs.org/).
+You will need to install [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/), [https](https://crates.io/crates/https) and [Node JS](https://nodejs.org/).
 
 Then run:
 
 ```
 npm install
-npm run build
+npm run watch
 ```
 
-Then start a web server in the root directory of this repository via e.g.
-`python -m http.server` and visit it.
+Then visit http://localhost:8000.
+
+Note that while TypeScript will be automatically rebuild under `npm run watch`, rust code will _not_ be. You will need to rebuild the rust source manually via:
+
+```
+npm run wasm
+```

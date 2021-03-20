@@ -4,7 +4,9 @@
   "description": "To build and run this natively, you'll need to set up the SDL development libraries.",
   "main": "index.js",
   "scripts": {
-    "build": "wasm-pack build web --target web && tsc",
+    "wasm": "wasm-pack build web --target web",
+    "build": "npm run wasm && tsc",
+    "watch": "npm run wasm && concurrently -k \"tsc --watch --preserveWatchOutput\" \"http\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +21,8 @@
   "homepage": "https://github.com/toolness/cso#readme",
   "dependencies": {
     "typescript": "^4.2.3"
+  },
+  "devDependencies": {
+    "concurrently": "^6.0.0"
   }
 }

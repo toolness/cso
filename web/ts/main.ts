@@ -3,13 +3,19 @@ import init, { WebLevel } from "../pkg/web.js";
 const PX_SIZE = 8;
 const INITIAL_FPS = 15;
 
+async function fetchBytes(url: string): Promise<Uint8Array> {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Fetching "${url}" failed with HTTP ${res.status}`)
+  }
+  const buf = await res.arrayBuffer();
+  return new Uint8Array(buf);
+}
+
 async function run() {
   await init();
 
-  const res = await fetch("level.bmp");
-  const buf = await res.arrayBuffer();
-  const view = new Uint8Array(buf);
-  const level = WebLevel.new(view);
+  const level = WebLevel.new(await fetchBytes("level.bmp"));
   const width = level.get_width();
   const height = level.get_height();
 

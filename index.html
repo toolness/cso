@@ -8,13 +8,24 @@ canvas {
   image-rendering: pixelated;
 }
 </style>
-<title>cso</title>
-<h1>cso</h1>
+<title>Combined Sewer Overflow Simulator</title>
+<h1>Combined Sewer Overflow Simulator</h1>
 <canvas id="canvas"></canvas>
 <p>
   <label for="fps">Speed</label> <input type="range" id="fps" min="1" max="60" value="15" step="1">
 </p>
 <p>
   <label><input type="checkbox" id="rain"> Make it rain</label>
+</p>
+<p>
+  Above is a simulation of a combined sewer system in which sewage water (brown pixels) are combined with
+  surface runoff (blue pixels).
+</p>
+<p>
+  The body of water at the bottom left of the simulation is a canal into
+  which the sewer system may overflow.
+</p>
+<p>
+  Learn more at the <a href="https://github.com/toolness/cso/" target="_blank">GitHub repository</a> and <a href="https://en.wikipedia.org/wiki/Combined_sewer" target="_blank">Wikipedia</a>.
 </p>
 <script type="module" src="web/ts/main.js"></script>

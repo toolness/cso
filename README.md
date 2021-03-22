@@ -1,3 +1,11 @@
+This is a simulation of a combined sewer system in which sewage water (brown pixels) are combined with surface runoff (blue pixels).
+
+[You can try it online.](https://toolness.github.io/cso/)
+
+The algorithm for the simulation was inspired by Petri Purho's GDC talk [Exploring the Tech and Design of Noita](https://www.youtube.com/watch?v=prXuyMCgbTc).
+
+The core of the simulation is written in Rust, while the web version's user interface is in TypeScript.
+
 ## Native app (SDL)
 
 To build and run this natively, you'll need to set up the SDL development libraries.
@@ -37,7 +45,3 @@ Deploying the web version to GitHub Pages can be done via:
 ```
 npm run deploy
 ```
-
-## Other notes
-
-The algorithm for the simulation was inspired by Petri Purho's GDC talk [Exploring the Tech and Design of Noita](https://www.youtube.com/watch?v=prXuyMCgbTc).

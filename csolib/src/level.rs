@@ -19,6 +19,7 @@ pub struct Level {
     drains: Vec<CellDrain>,
     frame_number: u8,
     pub enable_water_factories: bool,
+    pub override_water_factory_count: Option<u8>,
     pub sim: CSO,
 }
 
@@ -70,17 +71,21 @@ impl Level {
             }
         }
     
-        Level { sim, factories, drains, enable_water_factories: false, frame_number: 0 }
+        Level { sim, factories, drains, enable_water_factories: false, frame_number: 0, override_water_factory_count: None }
     }
 
     pub fn tick(&mut self) {
         self.frame_number = (self.frame_number + 1) % 255;
         let i = self.frame_number;
         for factory in self.factories.iter() {
-            if factory.cell == Cell::Water && !self.enable_water_factories {
-                continue;
+            let mut count = factory.count;
+            if factory.cell == Cell::Water {
+                if !self.enable_water_factories {
+                    continue;
+                }
+                count = self.override_water_factory_count.unwrap_or(count);
             }
-            if i % factory.interval < factory.count && self.sim.is_empty_at(&factory.point) {
+            if i % factory.interval < count && self.sim.is_empty_at(&factory.point) {
                 self.sim.set(&factory.point, factory.cell);
             }
         }

@@ -29,6 +29,10 @@ impl WebLevel {
         self.level.enable_water_factories = enable;
     }
 
+    pub fn set_override_water_factory_count(&mut self, count: Option<u8>) {
+        self.level.override_water_factory_count = count;
+    }
+
     pub fn draw(&self, arr: &mut [u8]) {
         let mut i = 0;
         for y in 0..self.level.sim.height {

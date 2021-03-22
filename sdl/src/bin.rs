@@ -32,9 +32,10 @@ fn main() {
 
     print!("Combined Sewage Overflow simulator\n");
     print!("Keys:\n");
-    print!("R - Toggle rain\n");
-    print!("- - Decrease FPS\n");
-    print!("= - Increase FPS\n");
+    print!("R   Toggle rain\n");
+    print!("-   Decrease FPS\n");
+    print!("=   Increase FPS\n");
+    print!("ESC Quit\n");
 
     let window = video_subsystem.window("cso", level.sim.width * PX_SIZE, level.sim.height * PX_SIZE)
         .position_centered()

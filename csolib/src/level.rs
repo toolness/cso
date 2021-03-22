@@ -61,7 +61,7 @@ impl Level {
                 BMP_DRAIN_COLOR => {
                     drains.push(CellDrain {
                         point,
-                        interval: 16
+                        interval: 12
                     });
                 }
                 BMP_WATER_COLOR => {

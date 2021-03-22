@@ -1,7 +1,6 @@
 import init, { WebLevel } from "../pkg/web.js";
 
 const PX_SIZE = 8;
-const INITIAL_FPS = 15;
 
 async function fetchBytes(url: string): Promise<Uint8Array> {
   const res = await fetch(url);

@@ -68,6 +68,11 @@ function getCanvasCtx2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 
 type TimeoutKind = "raf"|"timeout";
 
+type TimeoutInfo = {
+  timeout: number,
+  kind: TimeoutKind,
+};
+
 const CANCEL_TIMEOUT: { [key in TimeoutKind]: (timeout: number) => void } = {
   "raf": timeout => window.cancelAnimationFrame(timeout),
   "timeout": timeout => window.clearTimeout(timeout),
@@ -85,21 +90,24 @@ async function run() {
 
   const ctx = getCanvasCtx2d(canvas);
   const {imgData, uint8Array} = createCanvasImageData(ctx);
-  let timeout = 0;
-  let timeoutKind: TimeoutKind = "timeout";
+  let timeoutInfo: TimeoutInfo|null = null;
 
   const scheduleNextFrame = () => {
     const fps = toPositiveFloat(fpsRange.value);
     if (fps < 60) {
-      timeout = window.setTimeout(drawFrame, 1000 / fps);
-      timeoutKind = "timeout";
+      timeoutInfo = {
+        kind: "timeout",
+        timeout: window.setTimeout(drawFrame, 1000 / fps),
+      };
     } else {
-      window.requestAnimationFrame(drawFrame);
-      timeoutKind = "raf";
+      timeoutInfo = {
+        kind: "raf",
+        timeout: window.requestAnimationFrame(drawFrame),
+      };
     }
   };
 
-  const drawFrame = () => {
+  const configureRain = () => {
     const rain = parseInt(rainRange.value);
     if (rain === 0) {
       level.set_enable_water_factories(false);
@@ -107,18 +115,26 @@ async function run() {
       level.set_override_water_factory_count(rain);
       level.set_enable_water_factories(true);
     }
+  };
+
+  const drawFrame = () => {
+    configureRain();
     level.draw(uint8Array);
     ctx.putImageData(imgData, 0, 0);
     level.tick();
     scheduleNextFrame();
-  }
+  };
+
+  const shutdown = () => {
+    level.free();
+    if (timeoutInfo) {
+      CANCEL_TIMEOUT[timeoutInfo.kind](timeoutInfo.timeout);
+    }
+  };
 
   drawFrame();
 
-  return () => {
-    level.free();
-    CANCEL_TIMEOUT[timeoutKind](timeout);
-  };
+  return shutdown;
 }
 
 run();

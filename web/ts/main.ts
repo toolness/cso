@@ -67,6 +67,13 @@ function getCanvasCtx2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   return ctx;
 }
 
+type TimeoutKind = "raf"|"timeout";
+
+const CANCEL_TIMEOUT: { [key in TimeoutKind]: (timeout: number) => void } = {
+  "raf": timeout => window.cancelAnimationFrame(timeout),
+  "timeout": timeout => window.clearTimeout(timeout),
+};
+
 async function run() {
   await init();
 
@@ -80,6 +87,18 @@ async function run() {
   const ctx = getCanvasCtx2d(canvas);
   const {imgData, uint8Array} = createCanvasImageData(ctx);
   let timeout = 0;
+  let timeoutKind: TimeoutKind = "timeout";
+
+  const scheduleNextFrame = () => {
+    const fps = toPositiveFloat(fpsRange.value);
+    if (fps < 60) {
+      timeout = window.setTimeout(drawFrame, 1000 / fps);
+      timeoutKind = "timeout";
+    } else {
+      window.requestAnimationFrame(drawFrame);
+      timeoutKind = "raf";
+    }
+  };
 
   const drawFrame = () => {
     const rain = parseInt(rainRange.value);
@@ -92,14 +111,14 @@ async function run() {
     level.draw(uint8Array);
     ctx.putImageData(imgData, 0, 0);
     level.tick();
-    timeout = window.setTimeout(drawFrame, 1000 / toPositiveFloat(fpsRange.value));
+    scheduleNextFrame();
   }
 
   drawFrame();
 
   return () => {
     level.free();
-    window.clearTimeout(timeout);
+    CANCEL_TIMEOUT[timeoutKind](timeout);
   };
 }
 

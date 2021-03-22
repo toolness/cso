@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "wasm": "wasm-pack build web --target web",
+    "wasm": "wasm-pack build web --target web --release",
     "build": "npm run wasm && tsc",
     "watch": "npm run wasm && concurrently -k \"tsc --watch --preserveWatchOutput\" \"http\"",
     "export": "npm run build && node web/ts/export.js",

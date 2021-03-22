@@ -61,7 +61,14 @@ async function run() {
     const { imgData, uint8Array } = createCanvasImageData(ctx);
     let timeout = 0;
     const drawFrame = () => {
-        level.set_enable_water_factories(parseInt(rainRange.value) > 0);
+        const rain = parseInt(rainRange.value);
+        if (rain === 0) {
+            level.set_enable_water_factories(false);
+        }
+        else if (rain > 0) {
+            level.set_override_water_factory_count(rain);
+            level.set_enable_water_factories(true);
+        }
         level.draw(uint8Array);
         ctx.putImageData(imgData, 0, 0);
         level.tick();

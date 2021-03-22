@@ -25,6 +25,10 @@ function passArray8ToWasm0(arg, malloc) {
     WASM_VECTOR_LEN = arg.length;
     return ptr;
 }
+
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
 /**
 */
 export class WebLevel {
@@ -76,6 +80,12 @@ export class WebLevel {
     */
     set_enable_water_factories(enable) {
         wasm.weblevel_set_enable_water_factories(this.ptr, enable);
+    }
+    /**
+    * @param {number | undefined} count
+    */
+    set_override_water_factory_count(count) {
+        wasm.weblevel_set_override_water_factory_count(this.ptr, isLikeNone(count) ? 0xFFFFFF : count);
     }
     /**
     * @param {Uint8Array} arr

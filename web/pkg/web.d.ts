@@ -22,6 +22,10 @@ export class WebLevel {
 */
   set_enable_water_factories(enable: boolean): void;
 /**
+* @param {number | undefined} count
+*/
+  set_override_water_factory_count(count?: number): void;
+/**
 * @param {Uint8Array} arr
 */
   draw(arr: Uint8Array): void;
@@ -39,6 +43,7 @@ export interface InitOutput {
   readonly weblevel_get_width: (a: number) => number;
   readonly weblevel_get_height: (a: number) => number;
   readonly weblevel_set_enable_water_factories: (a: number, b: number) => void;
+  readonly weblevel_set_override_water_factory_count: (a: number, b: number) => void;
   readonly weblevel_draw: (a: number, b: number, c: number) => void;
   readonly weblevel_tick: (a: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;

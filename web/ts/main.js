@@ -1,6 +1,5 @@
 import init, { WebLevel } from "../pkg/web.js";
 const PX_SIZE = 8;
-const INITIAL_FPS = 15;
 async function fetchBytes(url) {
     const res = await fetch(url);
     if (!res.ok) {
@@ -50,6 +49,10 @@ function getCanvasCtx2d(canvas) {
     }
     return ctx;
 }
+const CANCEL_TIMEOUT = {
+    "raf": timeout => window.cancelAnimationFrame(timeout),
+    "timeout": timeout => window.clearTimeout(timeout),
+};
 async function run() {
     await init();
     const level = WebLevel.new(await fetchBytes("level.bmp"));
@@ -59,8 +62,23 @@ async function run() {
     setCanvasSize(canvas, level);
     const ctx = getCanvasCtx2d(canvas);
     const { imgData, uint8Array } = createCanvasImageData(ctx);
-    let timeout = 0;
-    const drawFrame = () => {
+    let timeoutInfo = null;
+    const scheduleNextFrame = () => {
+        const fps = toPositiveFloat(fpsRange.value);
+        if (fps < 60) {
+            timeoutInfo = {
+                kind: "timeout",
+                timeout: window.setTimeout(drawFrame, 1000 / fps),
+            };
+        }
+        else {
+            timeoutInfo = {
+                kind: "raf",
+                timeout: window.requestAnimationFrame(drawFrame),
+            };
+        }
+    };
+    const configureRain = () => {
         const rain = parseInt(rainRange.value);
         if (rain === 0) {
             level.set_enable_water_factories(false);
@@ -69,16 +87,22 @@ async function run() {
             level.set_override_water_factory_count(rain);
             level.set_enable_water_factories(true);
         }
+    };
+    const drawFrame = () => {
+        configureRain();
         level.draw(uint8Array);
         ctx.putImageData(imgData, 0, 0);
         level.tick();
-        timeout = window.setTimeout(drawFrame, 1000 / toPositiveFloat(fpsRange.value));
+        scheduleNextFrame();
+    };
+    const shutdown = () => {
+        level.free();
+        if (timeoutInfo) {
+            CANCEL_TIMEOUT[timeoutInfo.kind](timeoutInfo.timeout);
+        }
     };
     drawFrame();
-    return () => {
-        level.free();
-        window.clearTimeout(timeout);
-    };
+    return shutdown;
 }
 run();
 //# sourceMappingURL=main.js.map

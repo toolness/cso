@@ -37,3 +37,7 @@ Deploying the web version to GitHub Pages can be done via:
 ```
 npm run deploy
 ```
+
+## Other notes
+
+The algorithm for the simulation was inspired by Petri Purho's GDC talk [Exploring the Tech and Design of Noita](https://www.youtube.com/watch?v=prXuyMCgbTc).

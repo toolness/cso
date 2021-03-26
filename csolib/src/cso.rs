@@ -5,6 +5,7 @@ pub const SEWAGE_PURITY: u8 = 0;
 pub const MAX_PURITY: u8 = 100;
 const SEWAGE_SPREAD_RATE: u8 = 5;
 const MAX_PURITY_TO_SPREAD_SEWAGE: u8 = 25;
+const MIN_PURITY_TO_SLIDE: u8 = 75;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum Cell {
@@ -167,10 +168,13 @@ impl CSO {
     fn tick_point(&mut self, p: &Point) {
         if self.is_liquid_at(p) {
             if let Some(ref above) = p.above() {
-                if self.is_liquid_at(above) {
-                    if let Some(ref to) = self.get_closest_path_down(above) {
-                        return self.move_from_to(above, to);
-                    } else if let Some(ref displacement) = self.get_liquid_displacement(*p) {
+                if let Cell::Water(purity) = self.get(above) {
+                    if purity >= MIN_PURITY_TO_SLIDE {
+                        if let Some(ref to) = self.get_closest_path_down(above) {
+                            return self.move_from_to(above, to);
+                        }
+                    }
+                    if let Some(ref displacement) = self.get_liquid_displacement(*p) {
                         self.apply_displacement(&displacement);
                         return self.move_from_to(above, p);
                     }

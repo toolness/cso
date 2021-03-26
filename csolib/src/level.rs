@@ -33,16 +33,20 @@ pub const BMP_WATER_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 95, g: 205, b: 2
 pub const BMP_DRAIN_COLOR: bmp::Pixel = bmp::Pixel { r: 153, g: 229, b: 80 };
 pub const BMP_WATER_COLOR: bmp::Pixel = bmp::Pixel { r: 91, g: 110, b: 225 };
 
-fn lerp_u8(a: u8, b: u8, amount: f32) -> u8 {
-    let max_delta: i32 = b as i32 - a as i32;
-    let value = (a as f32 + max_delta as f32 * amount) as i32;
-    if value < 0 {
-        0
-    } else if value > 255 {
-        255
+fn clamped_u8(value: i32) -> u8 {
+    if value < u8::MIN as i32 {
+        u8::MIN
+    } else if value > u8::MAX as i32 {
+        u8::MAX
     } else {
         value as u8
     }
+}
+
+fn lerp_u8(a: u8, b: u8, amount: f32) -> u8 {
+    let max_delta: i32 = b as i32 - a as i32;
+    let value = (a as f32 + max_delta as f32 * amount) as i32;
+    clamped_u8(value)
 }
 
 fn lerp_color(a: bmp::Pixel, b: bmp::Pixel, amount: f32) -> bmp::Pixel {

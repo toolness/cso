@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "wasm": "wasm-pack build web --target web --release",
     "build": "npm run wasm && tsc",
     "watch": "npm run wasm && concurrently -k \"tsc --watch --preserveWatchOutput\" \"http\"",

@@ -6,19 +6,13 @@ use sdl2::rect::Rect;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
-use csolib::cso::Cell;
 use csolib::point::Point;
-use csolib::level::{Level, BMP_SEWAGE_FACTORY_COLOR, BMP_WATER_COLOR};
+use csolib::level::Level;
 
 const PX_SIZE: u32 = 8;
 const INITIAL_FPS: u32 = 15;
 const FPS_INCREMENT: u32 = 15;
 const MAX_FPS: u32 = 60;
-
-const STATIC_COLOR: Color = Color::WHITE;
-const EMPTY_COLOR: Color = Color::BLACK;
-const SEWAGE_COLOR: Color = bmp_to_sdl_color(&BMP_SEWAGE_FACTORY_COLOR);
-const WATER_COLOR: Color = bmp_to_sdl_color(&BMP_WATER_COLOR);
 
 const fn bmp_to_sdl_color(color: &bmp::Pixel) -> Color {
     Color::RGBA(color.r, color.g, color.b, 255)
@@ -49,13 +43,7 @@ fn main() {
 
         for y in 0..level.sim.height {
             for x in 0..level.sim.width {
-                let color: Color = match level.sim.get(&Point::at(x, y)) {
-                    Cell::Empty => { EMPTY_COLOR }
-                    Cell::Static => { STATIC_COLOR }
-                    Cell::Sand => { SEWAGE_COLOR }
-                    Cell::Water => { WATER_COLOR }
-                    Cell::Sewage => { SEWAGE_COLOR }
-                };
+                let color = bmp_to_sdl_color(&level.get_color(&Point::at(x, y)));
                 canvas.set_draw_color(color);
                 canvas.fill_rect(Rect::new((x * PX_SIZE) as i32, (y * PX_SIZE) as i32, PX_SIZE, PX_SIZE)).unwrap();
             }

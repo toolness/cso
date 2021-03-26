@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-use csolib::cso::Cell;
 use csolib::point::Point;
 use csolib::level::Level;
 
@@ -37,13 +36,7 @@ impl WebLevel {
         let mut i = 0;
         for y in 0..self.level.sim.height {
             for x in 0..self.level.sim.width {
-                let color: &bmp::Pixel = match self.level.sim.get(&Point::at(x, y)) {
-                    Cell::Empty => { &bmp::consts::BLACK }
-                    Cell::Static => { &bmp::consts::WHITE }
-                    Cell::Sand => { &csolib::level::BMP_SEWAGE_FACTORY_COLOR }
-                    Cell::Water => { &csolib::level::BMP_WATER_COLOR }
-                    Cell::Sewage => { &csolib::level::BMP_SEWAGE_FACTORY_COLOR }
-                };
+                let color = self.level.get_color(&Point::at(x, y));
                 arr[i] = color.r;
                 arr[i + 1] = color.g;
                 arr[i + 2] = color.b;

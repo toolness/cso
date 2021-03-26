@@ -24,6 +24,7 @@ pub struct Level {
 }
 
 pub const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
+pub const BMP_EMPTY_COLOR: bmp::Pixel = bmp::consts::BLACK;
 pub const BMP_SEWAGE_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
 pub const BMP_WATER_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 95, g: 205, b: 228 };
 pub const BMP_DRAIN_COLOR: bmp::Pixel = bmp::Pixel { r: 153, g: 229, b: 80 };
@@ -72,6 +73,16 @@ impl Level {
         }
     
         Level { sim, factories, drains, enable_water_factories: false, frame_number: 0, override_water_factory_count: None }
+    }
+
+    pub fn get_color(&self, point: &Point) -> bmp::Pixel {
+        match self.sim.get(&point) {
+            Cell::Empty => { BMP_EMPTY_COLOR }
+            Cell::Static => { BMP_STATIC_COLOR }
+            Cell::Sand => { BMP_SEWAGE_FACTORY_COLOR }
+            Cell::Water => { BMP_WATER_COLOR }
+            Cell::Sewage => { BMP_SEWAGE_FACTORY_COLOR }
+        }
     }
 
     pub fn tick(&mut self) {

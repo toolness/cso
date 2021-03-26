@@ -1,6 +1,11 @@
 use super::point::Point;
 use super::random::Random;
 
+pub const SEWAGE_PURITY: u8 = 0;
+pub const MAX_PURITY: u8 = 100;
+const SEWAGE_SPREAD_RATE: u8 = 5;
+const MAX_PURITY_TO_SPREAD_SEWAGE: u8 = 25;
+
 #[derive(PartialEq, Clone, Copy)]
 pub enum Cell {
     Empty,
@@ -131,14 +136,11 @@ impl CSO {
             let point_cell = self.get(point);
             let other_cell = self.get(other);
             if let (Cell::Water(mut point_purity), Cell::Water(mut other_purity)) = (point_cell, other_cell) {
-                if point_purity < other_purity {
-                    point_purity += 1;
-                    other_purity -= 1;
-                } else if point_purity > other_purity {
-                    point_purity -= 1;
-                    other_purity += 1;
-                } else {
-                    return;
+                if point_purity < MAX_PURITY_TO_SPREAD_SEWAGE {
+                    other_purity = other_purity.checked_sub(SEWAGE_SPREAD_RATE).unwrap_or(0);
+                }
+                if other_purity < MAX_PURITY_TO_SPREAD_SEWAGE {
+                    point_purity = point_purity.checked_sub(SEWAGE_SPREAD_RATE).unwrap_or(0);
                 }
                 self.set(point, Cell::Water(point_purity));
                 self.set(other, Cell::Water(other_purity));

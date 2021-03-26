@@ -1,4 +1,4 @@
-use super::cso::{CSO, Cell};
+use super::cso::{CSO, Cell, MAX_PURITY, SEWAGE_PURITY};
 use super::random::Random;
 use super::point::Point;
 
@@ -22,9 +22,6 @@ pub struct Level {
     pub override_water_factory_count: Option<u8>,
     pub sim: CSO,
 }
-
-const SEWAGE_PURITY: u8 = 0;
-const MAX_PURITY: u8 = 100;
 
 pub const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
 pub const BMP_EMPTY_COLOR: bmp::Pixel = bmp::consts::BLACK;

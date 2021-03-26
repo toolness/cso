@@ -21,6 +21,12 @@ pub struct CSO {
     pub height: u32,
 }
 
+struct Displacement {
+    start: Point,
+    end: Point,
+    direction: i8,
+}
+
 impl CSO {
     pub fn new(width: u32, height: u32, rng: Random) -> CSO {
         CSO { arr: vec![Cell::Empty; (width * height) as usize], width, height, rng }
@@ -103,21 +109,21 @@ impl CSO {
         }
     }
 
-    fn get_liquid_displacement(&self, start_point: &Point) -> Option<Point> {
-        let mut to_explore: Vec<(Point, i8)> = vec![(*start_point, -1), (*start_point, 1)];
-        let mut best: Option<(Point, i32)> = None;
+    fn get_liquid_displacement(&self, start_point: Point) -> Option<Displacement> {
+        let mut to_explore: Vec<(Point, i8)> = vec![(start_point, -1), (start_point, 1)];
+        let mut best: Option<(Point, i32, i8)> = None;
 
         while let Some((p, direction)) = to_explore.pop() {
             let maybe_neighbor = self.in_lateral_direction(&p, direction);
             if let Some(neighbor) = maybe_neighbor {
                 if self.is_empty_at(&neighbor) {
                     let dist = ((neighbor.x as i32 - start_point.x as i32) + (neighbor.y as i32 - start_point.y as i32)).abs();
-                    if let Some((_, best_dist)) = best {
+                    if let Some((_, best_dist, _)) = best {
                         if dist < best_dist {
-                            best = Some((neighbor, dist));
+                            best = Some((neighbor, dist, direction));
                         }
                     } else {
-                        best = Some((neighbor, dist));
+                        best = Some((neighbor, dist, direction));
                     }
                 } else if self.is_liquid_at(&neighbor) {
                     to_explore.push((neighbor, direction));
@@ -126,8 +132,18 @@ impl CSO {
         }
 
         match best {
-            Some((best_point, _)) => Some(best_point),
+            Some((end, _, direction)) => Some(Displacement { start: start_point, end, direction }),
             None => None,
+        }
+    }
+
+    fn apply_displacement(&mut self, dis: &Displacement) {
+        assert_eq!(dis.start.y, dis.end.y);
+        let mut point = dis.end;
+        while point.x != dis.start.x {
+            let from_point = self.in_lateral_direction(&point, -dis.direction).unwrap();
+            self.move_from_to(&from_point, &point);
+            point = from_point;
         }
     }
 
@@ -154,8 +170,9 @@ impl CSO {
                 if self.is_liquid_at(above) {
                     if let Some(ref to) = self.get_closest_path_down(above) {
                         return self.move_from_to(above, to);
-                    } else if let Some(ref displacement) = self.get_liquid_displacement(p) {
-                        return self.move_from_to(above, displacement);
+                    } else if let Some(ref displacement) = self.get_liquid_displacement(*p) {
+                        self.apply_displacement(&displacement);
+                        return self.move_from_to(above, p);
                     }
                 }
             }

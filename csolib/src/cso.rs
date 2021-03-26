@@ -6,8 +6,7 @@ pub enum Cell {
     Empty,
     Static,
     Sand,
-    Water,
-    Sewage,
+    Water(u8),
 }
 
 pub struct CSO {
@@ -47,7 +46,7 @@ impl CSO {
 
     pub fn is_liquid_at(&self, point: &Point) -> bool {
         match self.get(point) {
-            Cell::Water | Cell::Sewage => true,
+            Cell::Water(..) => true,
             _ => false
         }
     }
@@ -131,10 +130,18 @@ impl CSO {
         if let Some(other) = maybe_other {
             let point_cell = self.get(point);
             let other_cell = self.get(other);
-            if point_cell == Cell::Water && other_cell == Cell::Sewage {
-                self.set(point, Cell::Sewage);
-            } else if point_cell == Cell::Sewage && other_cell == Cell::Water {
-                self.set(other, Cell::Sewage);
+            if let (Cell::Water(mut point_purity), Cell::Water(mut other_purity)) = (point_cell, other_cell) {
+                if point_purity < other_purity {
+                    point_purity += 1;
+                    other_purity -= 1;
+                } else if point_purity > other_purity {
+                    point_purity -= 1;
+                    other_purity += 1;
+                } else {
+                    return;
+                }
+                self.set(point, Cell::Water(point_purity));
+                self.set(other, Cell::Water(other_purity));
             }
         }
     }

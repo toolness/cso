@@ -23,12 +23,35 @@ pub struct Level {
     pub sim: CSO,
 }
 
+const SEWAGE_PURITY: u8 = 0;
+const MAX_PURITY: u8 = 100;
+
 pub const BMP_STATIC_COLOR: bmp::Pixel = bmp::consts::WHITE;
 pub const BMP_EMPTY_COLOR: bmp::Pixel = bmp::consts::BLACK;
 pub const BMP_SEWAGE_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 143, g: 86, b: 59 };
 pub const BMP_WATER_FACTORY_COLOR: bmp::Pixel = bmp::Pixel { r: 95, g: 205, b: 228 };
 pub const BMP_DRAIN_COLOR: bmp::Pixel = bmp::Pixel { r: 153, g: 229, b: 80 };
 pub const BMP_WATER_COLOR: bmp::Pixel = bmp::Pixel { r: 91, g: 110, b: 225 };
+
+fn lerp_u8(a: u8, b: u8, amount: f32) -> u8 {
+    let max_delta: i32 = b as i32 - a as i32;
+    let value = (a as f32 + max_delta as f32 * amount) as i32;
+    if value < 0 {
+        0
+    } else if value > 255 {
+        255
+    } else {
+        value as u8
+    }
+}
+
+fn lerp_color(a: bmp::Pixel, b: bmp::Pixel, amount: f32) -> bmp::Pixel {
+    bmp::Pixel {
+        r: lerp_u8(a.r, b.r, amount),
+        g: lerp_u8(a.g, b.g, amount),
+        b: lerp_u8(a.b, b.b, amount),
+    }
+}
 
 impl Level {
     pub fn from_bmp(image: bmp::Image) -> Level {
@@ -46,7 +69,7 @@ impl Level {
                 BMP_WATER_FACTORY_COLOR => {
                     factories.push(CellFactory {
                         point,
-                        cell: Cell::Water,
+                        cell: Cell::Water(MAX_PURITY),
                         interval: 8,
                         count: 2
                     });
@@ -54,7 +77,7 @@ impl Level {
                 BMP_SEWAGE_FACTORY_COLOR => {
                     factories.push(CellFactory {
                         point,
-                        cell: Cell::Sewage,
+                        cell: Cell::Water(SEWAGE_PURITY),
                         interval: 8,
                         count: 1
                     });
@@ -66,7 +89,7 @@ impl Level {
                     });
                 }
                 BMP_WATER_COLOR => {
-                    sim.set(&point, Cell::Water);
+                    sim.set(&point, Cell::Water(MAX_PURITY));
                 }
                 _ => {}
             }
@@ -80,8 +103,9 @@ impl Level {
             Cell::Empty => { BMP_EMPTY_COLOR }
             Cell::Static => { BMP_STATIC_COLOR }
             Cell::Sand => { BMP_SEWAGE_FACTORY_COLOR }
-            Cell::Water => { BMP_WATER_COLOR }
-            Cell::Sewage => { BMP_SEWAGE_FACTORY_COLOR }
+            Cell::Water(purity) => {
+                lerp_color(BMP_SEWAGE_FACTORY_COLOR, BMP_WATER_COLOR, purity as f32 / MAX_PURITY as f32)
+            }
         }
     }
 
@@ -90,7 +114,7 @@ impl Level {
         let i = self.frame_number;
         for factory in self.factories.iter() {
             let mut count = factory.count;
-            if factory.cell == Cell::Water {
+            if let Cell::Water(MAX_PURITY) = factory.cell {
                 if !self.enable_water_factories {
                     continue;
                 }
